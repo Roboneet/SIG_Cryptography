@@ -14,7 +14,7 @@ var atob = require('atob');
 var helper3 = require('../../Problem_3/Neethu/helper.js')
 var xor_analysis = require('../../Problem_4/Neethu/helper.js')
 
-
+// console.log(Date.now(),': Reading File');
 var file = fs.createReadStream('./input.txt');
 
 file.on('error', function(){
@@ -24,30 +24,40 @@ file.on('error', function(){
 
 
 file.pipe(concat(function(buff){							// open file and concat lines
+	// console.log(Date.now(), ': Concated input');
 	lines = buff.toString();
 	ascii_lines = atob(lines);								// decode lines into ascii
 	
 	var i = 2, info_key = [];
 	for(; i< 41; i++){
+		// console.log(Date.now(), ': evalute key of size', i)
 		info_key.push(eval_keysize(i,ascii_lines));			// evalute hamming distance for each keysize
 	}
 
+	// console.log(Date.now(), ': sort hamming distances')
 	info_key.sort(function(a,b){							//sort based on hamming distance
 		return a.ham - b.ham;
 	})
 	// console.log(info_key)
-
+	// console.log(Date.now(), ": sorting over");
 	top_key_sizes = [info_key[0]['size'],info_key[1]['size'], info_key[2]['size']];		//choose top 3
 
 	var key 
-	for(var i = 0; i< top_key_sizes.length; i++){					
+	for(var i = 0; i< top_key_sizes.length; i++){
+		var start = Date.now();					
+		console.log(Date.now(), ": find key of size", top_key_sizes[i]);
 		var k = find_key(top_key_sizes[i], ascii_lines);		// find key for the chosen lengths
-		if(k)
-			key = k
+		if(k){
+			key = k;
+			console.log(Date.now() + ": Found key '" + k + "' in time " + (Date.now() - start)/1000 + " seconds")
+		}else{
+			console.log(Date.now(),': Find key failed');
+		}
 	}
 
-
+	console.log(Date.now(),': Decrypt Text');
 	var text_decrypted = decrypt(key, ascii_lines);
+	console.log(Date.now(),': Decrypted Text');
 	let str = "The key is : " + key +'\n'+'Decrypted text: \n'+ text_decrypted;
 
 	fs.writeFile('./output.txt', str, function(err){		// save output in output.txt
