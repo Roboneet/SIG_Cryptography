@@ -1,11 +1,5 @@
 include("../../Problem_4/Neethu/xor.jl")
-
-function hamming_distance(a, b)
-    c = xor.(a, b)
-    d = [count(x-> x=='1', bits(k)) for k in c]
-    return sum(d)
-end
-
+include("hamming.jl")
 
 hamming_distance(map(Int, collect("this is a test")), map(Int, collect("wokka wokka!!!")))
 
